@@ -31,7 +31,7 @@ def secure_password(password):
     if len(password) < 8:
         return "Password length must exceed 7 characters"
     for char in password:
-        if type(char) is int:
+        if char.isdigit():
             num = True
         if char in specialChar:
             special = True
