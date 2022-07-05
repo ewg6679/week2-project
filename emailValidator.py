@@ -9,7 +9,6 @@ description: Checks if a given email address is valid
 
 import requests
 
-
 def get_email(email):
     url = "https://mailcheck.p.rapidapi.com/"
 
@@ -21,30 +20,36 @@ def get_email(email):
     }
 
     response = requests.request("GET", url, headers=headers, params=querystring)
-
-    return response.text
+    valid = response.json().get("valid")
+    if valid is True:
+        return "Valid email"
+    else:
+        get_email(input("Invalid email try again: "))
+        
+    
+    
 
 def secure_password(password):
     specialChar = '[@_!#$%^&*()<>?/\|}{~:]'
     num = False
     special = False
     if len(password) < 8:
-        return "Password length must exceed 7 characters"
+        return secure_password(input("Password length must exceed 7 characters: ")
     for char in password:
-        if type(char) is int:
+        if char.isdigit():
             num = True
         if char in specialChar:
             special = True
     if num is True and special is True:
         return "Secure password"
     elif num is False and special is True:
-        return "Needs number in password"
+        return secure_password(input("Needs number in password: "))
     else:
-        return "Needs number and special character in password"
+        return secure_password(input("Needs number and special character in password: "))
 
 
 def main():
-    inpt = input("Email: ")
+    inpt = input("Email: ") 
     print(get_email(inpt))
     print("Secure password requirements: Must be 8 characters or longer, must include one number, and one special character")
     passwordInpt = input("Password: ")
