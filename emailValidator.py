@@ -4,6 +4,7 @@ author: Emmanuel Griffin
 author: Nicole de Moura
 
 description: Checks if a given email address is valid
+             Checks if a given password is secure
 """
 
 import requests
@@ -23,10 +24,31 @@ def get_email(email):
 
     return response.text
 
+def secure_password(password):
+    specialChar = '[@_!#$%^&*()<>?/\|}{~:]'
+    num = False
+    special = False
+    if len(password) < 8:
+        return "Password length must exceed 7 characters"
+    for char in password:
+        if type(char) is int:
+            num = True
+        if char in specialChar:
+            special = True
+    if num is True and special is True:
+        return "Secure password"
+    elif num is False and special is True:
+        return "Needs number in password"
+    else:
+        return "Needs number and special character in password"
+
 
 def main():
     inpt = input("Email: ")
     print(get_email(inpt))
+    print("Secure password requirements: Must be 8 characters or longer, must include one number, and one special character")
+    passwordInpt = input("Password: ")
+    print(secure_password(passwordInpt))
     
 
 
