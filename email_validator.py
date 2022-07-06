@@ -8,6 +8,7 @@ description: Checks if a given email address is valid
 """
 
 import requests
+import sqlite3
 
 
 def get_email(email):
@@ -20,9 +21,11 @@ def get_email(email):
         "X-RapidAPI-Host": "mailcheck.p.rapidapi.com"
     }
 
-    response = requests.request("GET", url, headers=headers, params=querystring)
+    response = requests.request(
+        "GET", url, headers=headers, params=querystring)
 
     return response.text
+
 
 def secure_password(password):
     specialChar = '[@_!#$%^&*()<>?/\|}{~:]'
@@ -31,7 +34,7 @@ def secure_password(password):
     if len(password) < 8:
         return "Password length must exceed 7 characters"
     for char in password:
-        if type(char) is int:
+        if char.isdigit():
             num = True
         if char in specialChar:
             special = True
@@ -43,14 +46,46 @@ def secure_password(password):
         return "Needs number and special character in password"
 
 
+def make_account():
+    conn = sqlite3.connect('accounts.db')
+
+    cursor = conn.cursor()
+
+    cursor.execute("DROP TABLE IF EXISTS ACCOUNTS")
+
+    sql = '''CREATE TABLE ACCOUNTS(
+    EMAIL CHAR(20) NOT NULL,
+    PASSWORD CHAR(20)
+    )'''
+    cursor.execute(sql)
+
+    cursor.execute('''INSERT INTO ACCOUNTS(
+    EMAIL, PASSWORD) VALUES 
+    ('email1@gmail.com', 'password')''')
+
+    cursor.execute('''INSERT INTO ACCOUNTS(
+    EMAIL, PASSWORD) VALUES 
+    ('email2@gmail.com', 'password')''')
+
+    cursor.execute('''INSERT INTO ACCOUNTS(
+    EMAIL, PASSWORD) VALUES 
+    ('email3@gmail.com', 'password')''')
+
+    conn.commit()
+    cursor.execute("SELECT * FROM ACCOUNTS")
+    print(cursor.fetchall())
+
+    conn.close()
+
+
 def main():
     inpt = input("Email: ")
     print(get_email(inpt))
     print("Secure password requirements: Must be 8 characters or longer, must include one number, and one special character")
     passwordInpt = input("Password: ")
     print(secure_password(passwordInpt))
-    
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    make_account()
