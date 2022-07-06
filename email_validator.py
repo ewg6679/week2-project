@@ -1,5 +1,5 @@
 """
-file: emailValidator.py
+file: email_validator.py
 author: Emmanuel Griffin
 author: Nicole de Moura
 
@@ -46,7 +46,7 @@ def secure_password(password):
         return "Needs number and special character in password"
 
 
-def make_account():
+def make_account(email, password):
     conn = sqlite3.connect('accounts.db')
 
     cursor = conn.cursor()
@@ -54,26 +54,18 @@ def make_account():
     cursor.execute("DROP TABLE IF EXISTS ACCOUNTS")
 
     sql = '''CREATE TABLE ACCOUNTS(
-    EMAIL CHAR(20) NOT NULL,
-    PASSWORD CHAR(20)
+    EMAIL VARCHAR(255),
+    PASSWORD VARCHAR(255)
     )'''
     cursor.execute(sql)
 
     cursor.execute('''INSERT INTO ACCOUNTS(
     EMAIL, PASSWORD) VALUES 
-    ('email1@gmail.com', 'password')''')
-
-    cursor.execute('''INSERT INTO ACCOUNTS(
-    EMAIL, PASSWORD) VALUES 
-    ('email2@gmail.com', 'password')''')
-
-    cursor.execute('''INSERT INTO ACCOUNTS(
-    EMAIL, PASSWORD) VALUES 
-    ('email3@gmail.com', 'password')''')
+    (?, ?)''', (email, password))
 
     conn.commit()
     cursor.execute("SELECT * FROM ACCOUNTS")
-    print(cursor.fetchall())
+    # print(cursor.fetchall())
 
     conn.close()
 
@@ -88,4 +80,4 @@ def main():
 
 if __name__ == '__main__':
     # main()
-    make_account()
+    make_account('email1@gmail.com', 'password')
