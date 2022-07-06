@@ -21,9 +21,11 @@ def get_email(email):
     response = requests.request("GET", url, headers=headers, params=querystring)
     valid = response.json().get("valid")
     if valid is True:
+        print("Valid email")
         return "Valid email"
     else:
-        get_email(input("Invalid email try again: "))
+        print("Invalid email, try again")
+        return "Invalid email, try again"
         
 
 def secure_password(password):
@@ -31,28 +33,37 @@ def secure_password(password):
     num = False
     special = False
     if len(password) < 8:
-        return secure_password(input("Password length must exceed 7 characters: ")
+        print("Password length must exceed 7 characters: ")
+        return "Password length must exceed 7 characters: "
     for char in password:
         if char.isdigit():
             num = True
         if char in specialChar:
             special = True
     if num is True and special is True:
-        return "Secure password"
+        print("Secure password")
+        return "Secure"
     elif num is False and special is True:
-        return secure_password(input("Needs number in password: "))
+        print(secure_password(input("Needs number in password: ")))
+        return "Needs number in password: "
+    elif num is True and special is False:
+        print(secure_password(input("Needs special character in password: ")))
+        return "Needs special character in password: "
     else:
-        return secure_password(input("Needs number and special character in password: "))
+        print(secure_password(input("Needs number and special character in password: ")))
+        return "Needs number and special character in password: "
 
 
 def main():
     inpt = input("Email: ") 
-    print(get_email(inpt))
+    emailValid = get_email(input("Enter your email: ")
+    while emailValid != "Valid email":
+        emailValid = get_email(input("Enter your email: ")
     print("Secure password requirements: Must be 8 characters or longer, must include one number, and one special character")
-    passwordInpt = input("Password: ")
-    print(secure_password(passwordInpt))
+    passwordValid = secure_password(input("Password: "))
+    while passwordValid != "Secure":
+        passwordValid = secure_password(input("Password ")
     
-
 
 if __name__ == '__main__':
     main()
