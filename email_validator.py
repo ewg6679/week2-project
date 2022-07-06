@@ -1,5 +1,5 @@
 """
-file: emailValidator.py
+file: email_validator.py
 author: Emmanuel Griffin
 author: Nicole de Moura
 description: Checks if a given email address is valid
@@ -8,6 +8,7 @@ description: Checks if a given email address is valid
 
 import requests
 import sqlite3
+
 
 def get_email(email):
     url = "https://mailcheck.p.rapidapi.com/"
@@ -19,41 +20,42 @@ def get_email(email):
         "X-RapidAPI-Host": "mailcheck.p.rapidapi.com"
     }
 
-    response = requests.request("GET", url, headers=headers, params=querystring)
+    response = requests.request(
+        "GET", url, headers=headers, params=querystring)
     valid = response.json().get("valid")
     if valid is True:
         print("Valid email")
-        return "Valid email"
+        return True
     else:
         print("Invalid email, try again")
-        return "Invalid email, try again"
-        
+        return False
+
 
 def secure_password(password):
-    specialChar = '[@_!#$%^&*()<>?/\|}{~:]'
+    special_char = '[@_!#$%^&*()<>?/\|}{~:]'
     num = False
     special = False
     if len(password) < 8:
         print("Password length must exceed 7 characters: ")
-        return "Password length must exceed 7 characters: "
+        return False
     for char in password:
         if char.isdigit():
             num = True
-        if char in specialChar:
+        if char in special_char:
             special = True
     if num is True and special is True:
         print("Secure password")
-        return "Secure"
+        return True
     elif num is False and special is True:
-        print(secure_password(input("Needs number in password: ")))
-        return "Needs number in password: "
+        print("Needs number in password")
+        return False
     elif num is True and special is False:
-        print(secure_password(input("Needs special character in password: ")))
-        return "Needs special character in password: "
+        print("Needs special character in password")
+        return False
     else:
-        print(secure_password(input("Needs number and special character in password: ")))
-        return "Needs number and special character in password: "
-        
+        print("Needs number and special character in password")
+        return False
+
 
 def make_account(email, password):
     conn = sqlite3.connect('accounts.db')
@@ -80,15 +82,14 @@ def make_account(email, password):
 
 
 def main():
-    inpt = input("Email: ") 
-    emailValid = get_email(input("Enter your email: ")
-    while emailValid != "Valid email":
-        emailValid = get_email(input("Enter your email: ")
+    email_valid = get_email(input("Email: "))
+    while not email_valid:
+        email_valid = get_email(input("Email: "))
     print("Secure password requirements: Must be 8 characters or longer, must include one number, and one special character")
-    passwordValid = secure_password(input("Password: "))
-    while passwordValid != "Secure":
-        passwordValid = secure_password(input("Password ")
+    password_valid = secure_password(input("Password: "))
+    while not password_valid:
+        password_valid = secure_password(input("Password: "))
 
-    
+
 if __name__ == '__main__':
     main()
