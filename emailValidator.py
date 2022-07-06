@@ -2,7 +2,6 @@
 file: emailValidator.py
 author: Emmanuel Griffin
 author: Nicole de Moura
-
 description: Checks if a given email address is valid
              Checks if a given password is secure
 """
@@ -26,8 +25,6 @@ def get_email(email):
     else:
         get_email(input("Invalid email try again: "))
         
-    
-    
 
 def secure_password(password):
     specialChar = '[@_!#$%^&*()<>?/\|}{~:]'
