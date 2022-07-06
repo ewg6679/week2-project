@@ -7,6 +7,7 @@ description: Checks if a given email address is valid
 """
 
 import requests
+import sqlite3
 
 def get_email(email):
     url = "https://mailcheck.p.rapidapi.com/"
@@ -52,6 +53,30 @@ def secure_password(password):
     else:
         print(secure_password(input("Needs number and special character in password: ")))
         return "Needs number and special character in password: "
+        
+
+def make_account(email, password):
+    conn = sqlite3.connect('accounts.db')
+
+    cursor = conn.cursor()
+
+    cursor.execute("DROP TABLE IF EXISTS ACCOUNTS")
+
+    sql = '''CREATE TABLE ACCOUNTS(
+    EMAIL VARCHAR(255),
+    PASSWORD VARCHAR(255)
+    )'''
+    cursor.execute(sql)
+
+    cursor.execute('''INSERT INTO ACCOUNTS(
+    EMAIL, PASSWORD) VALUES 
+    (?, ?)''', (email, password))
+
+    conn.commit()
+    cursor.execute("SELECT * FROM ACCOUNTS")
+    # print(cursor.fetchall())
+
+    conn.close()
 
 
 def main():
@@ -63,7 +88,7 @@ def main():
     passwordValid = secure_password(input("Password: "))
     while passwordValid != "Secure":
         passwordValid = secure_password(input("Password ")
-    
 
+    
 if __name__ == '__main__':
     main()
