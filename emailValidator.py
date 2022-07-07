@@ -38,7 +38,7 @@ password - the password the user wants to use
 secure_password - returns true if the password is secure and false otherwise 
 """
 def secure_password(password):
-    special_char = '[@_!#$%^&*()<>?/\|}{~:]'
+    special_char = '[@_!#$%^&*()<>?/\|}{~:]-=+'
     num = False
     special = False
     if len(password) < 8:

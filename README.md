@@ -7,6 +7,7 @@ Sign up validator is a program that lets a user type in an email and password an
 
 * **Set up**
   * Just clone the repository on your device
+  * Install coverage (sudo pip3 install coverage) 
 
 * **How to run**
   * Use terminal and run
