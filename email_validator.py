@@ -9,7 +9,10 @@ description: Checks if a given email address is valid
 import requests
 import sqlite3
 
-
+"""
+email - the email the user wants to sign up with
+get_email - returns true if the email given is valid and false otherwise
+"""
 def get_email(email):
     url = "https://mailcheck.p.rapidapi.com/"
 
@@ -23,20 +26,23 @@ def get_email(email):
     response = requests.request(
         "GET", url, headers=headers, params=querystring)
     valid = response.json().get("valid")
-    if valid is True:
+    if valid:
         print("Valid email")
-        return True
+        return email
     else:
         print("Invalid email, try again")
         return False
 
-
+"""
+password - the password the user wants to use
+secure_password - returns true if the password is secure and false otherwise 
+"""
 def secure_password(password):
     special_char = '[@_!#$%^&*()<>?/\|}{~:]'
     num = False
     special = False
     if len(password) < 8:
-        print("Password length must exceed 7 characters: ")
+        print("Password length must exceed 7 characters")
         return False
     for char in password:
         if char.isdigit():
@@ -45,7 +51,7 @@ def secure_password(password):
             special = True
     if num is True and special is True:
         print("Secure password")
-        return True
+        return password
     elif num is False and special is True:
         print("Needs number in password")
         return False
@@ -56,39 +62,103 @@ def secure_password(password):
         print("Needs number and special character in password")
         return False
 
-
+"""
+email - the email the user wants to make an account with
+password - the password the user wants to make an account with
+make_account - creates an account for a user and holds that data
+"""
 def make_account(email, password):
     conn = sqlite3.connect('accounts.db')
 
     cursor = conn.cursor()
 
-    cursor.execute("DROP TABLE IF EXISTS ACCOUNTS")
-
-    sql = '''CREATE TABLE ACCOUNTS(
+    sql = '''CREATE TABLE IF NOT EXISTS ACCOUNTS(
     EMAIL VARCHAR(255),
     PASSWORD VARCHAR(255)
     )'''
     cursor.execute(sql)
 
-    cursor.execute('''INSERT INTO ACCOUNTS(
-    EMAIL, PASSWORD) VALUES 
-    (?, ?)''', (email, password))
+    cursor.execute("SELECT EMAIL FROM ACCOUNTS WHERE EMAIL = ?", (email,))
+    exists = cursor.fetchone()
+
+    if exists:
+        print("An account with this email already exists")
+        conn.close()
+        return False
+    else:
+        cursor.execute('''INSERT INTO ACCOUNTS(
+        EMAIL, PASSWORD) VALUES 
+        (?, ?)''', (email, password))
 
     conn.commit()
     cursor.execute("SELECT * FROM ACCOUNTS")
-    # print(cursor.fetchall())
+    print("Welcome! You can now log in using your credentials",
+          cursor.fetchall()[-1])
+
+    conn.close()
+    return True
+
+"""
+"""
+def log_in():
+    conn = sqlite3.connect('accounts.db')
+
+    cursor = conn.cursor()
+
+    while True:
+        email = input("Email: ")
+        if email.isdigit() and int(email) == 2:
+            print("Signing up . . .")
+            sign_up()
+            break
+        try:
+            cursor.execute(
+                "SELECT EMAIL FROM ACCOUNTS WHERE EMAIL = ?", (email,))
+            if len(cursor.fetchall()) < 1:
+                raise Exception()
+            else:
+                print("Login success")
+            break
+        except:
+            print("Please enter an existing email address, or type 2 to sign up")
 
     conn.close()
 
+"""
 
-def main():
-    email_valid = get_email(input("Email: "))
-    while not email_valid:
-        email_valid = get_email(input("Email: "))
-    print("Secure password requirements: Must be 8 characters or longer, must include one number, and one special character")
-    password_valid = secure_password(input("Password: "))
-    while not password_valid:
+"""
+def sign_up():
+    while True:
+        email = input("Email: ")
+        email_valid = get_email(email)
+        while not email_valid:
+            email = input("Email: ")
+            email_valid = get_email(email)
+
+        print("Secure password requirements: Must be 8 characters or longer, must include one number, and one special character")
         password_valid = secure_password(input("Password: "))
+        while not password_valid:
+            password_valid = secure_password(input("Password: "))
+
+        if make_account(email_valid, password_valid):
+            break
+
+"""
+the full program running once 
+"""
+def main():
+    print("Type 1 to log in and 2 to sign up")
+    action = None
+    while action not in (1, 2):
+        action = input("> ")
+        if action.isdigit() and int(action) == 1:
+            log_in()
+            break
+        elif action.isdigit() and int(action) == 2:
+            sign_up()
+            break
+        else:
+            print("Please type a valid option")
 
 
 if __name__ == '__main__':
