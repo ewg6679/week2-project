@@ -84,7 +84,7 @@ def make_account(email, password):
     exists = cursor.fetchone()
 
     if exists:
-        print("An account with this email already exists")
+        print("An account with this email already exists, login instead")
         conn.close()
         return False
     else:
