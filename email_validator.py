@@ -66,6 +66,8 @@ def secure_password(password):
 email - the email the user wants to make an account with
 password - the password the user wants to make an account with
 make_account - creates an account for a user and holds that data
+returns false if an account is already made and true if the account
+was created 
 """
 def make_account(email, password):
     conn = sqlite3.connect('accounts.db')
@@ -82,7 +84,7 @@ def make_account(email, password):
     exists = cursor.fetchone()
 
     if exists:
-        print("An account with this email already exists")
+        print("An account with this email already exists, login instead")
         conn.close()
         return False
     else:
@@ -99,50 +101,52 @@ def make_account(email, password):
     return True
 
 """
+simulates a login, the user inputs an email, if you have signed
+in before with the same email you successfully have logged in
+if the email doesn't exist in our database (so you haven't signed up before)
+you will be prompted to try another email that has signed up or sign up now
+returns true if you sign up and false if you login
 """
-def log_in():
+def log_in(email):
     conn = sqlite3.connect('accounts.db')
 
     cursor = conn.cursor()
 
-    while True:
-        email = input("Email: ")
-        if email.isdigit() and int(email) == 2:
-            print("Signing up . . .")
-            sign_up()
-            break
-        try:
-            cursor.execute(
-                "SELECT EMAIL FROM ACCOUNTS WHERE EMAIL = ?", (email,))
-            if len(cursor.fetchall()) < 1:
-                raise Exception()
-            else:
-                print("Login success")
-            break
-        except:
-            print("Please enter an existing email address, or type 2 to sign up")
+    
+    if email.isdigit() and int(email) == 2:
+        print("Signing up . . .")
+        return sign_up()
+            
+    try:
+        cursor.execute(
+            "SELECT EMAIL FROM ACCOUNTS WHERE EMAIL = ?", (email,))
+        if len(cursor.fetchall()) < 1:
+            raise Exception()
+        else:
+            print("Login success")
+            return False
+    except:
+        print("Please enter an existing email address, or type 2 to sign up")
 
     conn.close()
 
 """
-
+sigh_up contuines to prompt the user for an email until they give a valid email
+after that they have to create a secure password
 """
-def sign_up():
-    while True:
+def sign_up(email):
+    email_valid = get_email(email)
+    while not email_valid:
         email = input("Email: ")
         email_valid = get_email(email)
-        while not email_valid:
-            email = input("Email: ")
-            email_valid = get_email(email)
 
-        print("Secure password requirements: Must be 8 characters or longer, must include one number, and one special character")
+    print("Secure password requirements: Must be 8 characters or longer, must include one number, and one special character")
+    password_valid = secure_password(input("Password: "))
+    while not password_valid:
         password_valid = secure_password(input("Password: "))
-        while not password_valid:
-            password_valid = secure_password(input("Password: "))
 
-        if make_account(email_valid, password_valid):
-            break
-
+    return make_account(email_valid, password_valid)
+        
 """
 the full program running once 
 """
@@ -152,10 +156,10 @@ def main():
     while action not in (1, 2):
         action = input("> ")
         if action.isdigit() and int(action) == 1:
-            log_in()
+            log_in(input("Email: "))
             break
         elif action.isdigit() and int(action) == 2:
-            sign_up()
+            sign_up(input("Email: "))
             break
         else:
             print("Please type a valid option")
